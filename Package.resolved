@@ -15,16 +15,16 @@
         "repositoryURL": "https://github.com/johnsundell/files.git",
         "state": {
           "branch": null,
-          "revision": "941052daf1c0aa6999343ee899dd3d743c86f211",
-          "version": "4.1.0"
+          "revision": "22fe84797d499ffca911ccd896b34efaf06a50b9",
+          "version": "4.1.1"
         }
       },
       {
         "package": "Ink",
         "repositoryURL": "https://github.com/steve-h/ink.git",
         "state": {
-          "branch": "stevepublishing",
-          "revision": "7bac7a3f28ca658269f4a78e00b5abbd9f621d4c",
+          "branch": "master",
+          "revision": "cfdc7e594dd5a00def309d47b70e42274e34e002",
           "version": null
         }
       },
