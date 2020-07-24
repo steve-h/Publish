@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/Swift-5.1-orange.svg" />
+    <img src="https://img.shields.io/badge/Swift-5.2-orange.svg" />
     <a href="https://swift.org/package-manager">
         <img src="https://img.shields.io/badge/swiftpm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
     </a>
@@ -87,9 +87,9 @@ try DeliciousRecipes().publish(
         )),
         // Add default titles to all sections
         .step(named: "Default section titles") { context in
-            guard section.title.isEmpty else { return }
-        
             context.mutateAllSections { section in
+                guard section.title.isEmpty else { return }
+                
                 switch section.id {
                 case .recipes:
                     section.title = "My recipes"
@@ -224,7 +224,15 @@ try DeliciousRecipes().publish(using: [
 ])
 ```
 
+*If your plugin is hosted on GitHub you can use the `publish-plugin` [topic](https://help.github.com/en/github/administering-a-repository/classifying-your-repository-with-topics#adding-topics-to-your-repository) so it can be found with the rest of [community plugins](https://github.com/topics/publish-plugin?l=swift).*
+
 For a real-world example of a Publish plugin, check out the [official Splash plugin](https://github.com/johnsundell/splashpublishplugin), which makes it really easy to integrate the [Splash syntax highlighter](https://github.com/johnsundell/splash) with Publish.
+
+## System requirements
+
+To be able to successfully use Publish, make sure that your system has Swift version 5.2 (or later) installed. If you’re using a Mac, also make sure that `xcode-select` is pointed at an Xcode installation that includes the required version of Swift, and that you’re running macOS Catalina (10.15) or later. 
+
+Please note that Publish **does not** officially support any form of beta software, including beta versions of Xcode and macOS, or unreleased versions of Swift.
 
 ## Installation
 
@@ -246,7 +254,7 @@ Then import Publish wherever you’d like to use it:
 import Publish
 ```
 
-For more information on how to use the Swift Package Manager, check out [this article](https://www.swiftbysundell.com/articles/managing-dependencies-using-the-swift-package-manager), or [its official documentation](https://github.com/apple/swift-package-manager/tree/master/Documentation).
+For more information on how to use the Swift Package Manager, check out [this article](https://www.swiftbysundell.com/articles/managing-dependencies-using-the-swift-package-manager), or [its official documentation](https://swift.org/package-manager).
 
 Publish also ships with a command line tool that makes it easy to set up new website projects, and to generate and deploy existing ones. To install that command line tool, simply run `make` within a local copy of the Publish repo:
 
@@ -273,7 +281,7 @@ try DeliciousRecipes().publish(using: [
 
 Even when added to a pipeline, deployment steps are disabled by default, and are only executed when the `--deploy` command line flag was passed (which can be added through Xcode’s `Product > Scheme > Edit Scheme...` menu), or by running the command line tool using `publish deploy`.
 
-Publish can also start a `localhost` web server for local testing and development, by using the `publish run` command.
+Publish can also start a `localhost` web server for local testing and development, by using the `publish run` command. To regenerate site content with the server running, use Product > Run on your site's package in Xcode.
 
 ## Quick start
 
@@ -285,6 +293,8 @@ $ cd Publish
 $ make
 ```
 
+_**Note**: If you encounter an error while running `make`, ensure that you have your Command Line Tools location set from Xcode's preferences. It's in Preferences > Locations > Locations > Command Line Tools. The dropdown will be blank if it hasn't been set yet._
+
 Then, create a new folder for your new website project and simply run `publish new` within it to get started:
 
 ```
@@ -294,6 +304,10 @@ $ publish new
 ```
 
 Finally, run `open Package.swift` to open up the project in Xcode to start building your new website.
+
+## Additional documentation
+
+You can find a growing collection of additional documentation about Publish’s various features and capabilities within the [Documentation folder](Documentation).
 
 ## Design and goals
 

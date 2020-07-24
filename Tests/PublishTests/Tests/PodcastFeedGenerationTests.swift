@@ -25,6 +25,26 @@ final class PodcastFeedGenerationTests: PublishTestCase {
         XCTAssertFalse(feed.contains("Not included"))
     }
 
+    func testOnlyIncludingItemsMatchingPredicate() throws {
+        let folder = try Folder.createTemporary()
+
+        try generateFeed(
+            in: folder,
+            itemPredicate: \.path == "one/a",
+            content: [
+                "one/a.md": """
+                \(makeStubbedAudioMetadata())
+                # Included
+                """,
+                "one/b.md": "# Not included"
+            ]
+        )
+
+        let feed = try folder.file(at: "Output/feed.rss").readAsString()
+        XCTAssertTrue(feed.contains("Included"))
+        XCTAssertFalse(feed.contains("Not included"))
+    }
+
     func testConvertingRelativeLinksToAbsolute() throws {
         let folder = try Folder.createTemporary()
 
@@ -43,6 +63,25 @@ final class PodcastFeedGenerationTests: PublishTestCase {
         <img src=\"https://swiftbysundell.com/image.png\" alt=\"Image\"/> \
         <a href="https://apple.com">Link</a>
         """)
+    }
+
+    func testItemPrefixAndSuffix() throws {
+        let folder = try Folder.createTemporary()
+
+        let prefixSuffix = """
+        rss.titlePrefix: Prefix
+        rss.titleSuffix: Suffix
+        """
+
+        try generateFeed(in: folder, content: [
+            "one/item.md": """
+            \(makeStubbedAudioMetadata(including: prefixSuffix))
+            # Title
+            """
+        ])
+
+        let feed = try folder.file(at: "Output/feed.rss").readAsString()
+        XCTAssertTrue(feed.contains("<title>PrefixTitleSuffix</title>"))
     }
 
     func testReusingPreviousFeedIfNoItemsWereModified() throws {
@@ -129,7 +168,9 @@ extension PodcastFeedGenerationTests {
     static var allTests: Linux.TestList<PodcastFeedGenerationTests> {
         [
             ("testOnlyIncludingSpecifiedSection", testOnlyIncludingSpecifiedSection),
+            ("testOnlyIncludingItemsMatchingPredicate", testOnlyIncludingItemsMatchingPredicate),
             ("testConvertingRelativeLinksToAbsolute", testConvertingRelativeLinksToAbsolute),
+            ("testItemPrefixAndSuffix", testItemPrefixAndSuffix),
             ("testReusingPreviousFeedIfNoItemsWereModified", testReusingPreviousFeedIfNoItemsWereModified),
             ("testNotReusingPreviousFeedIfConfigChanged", testNotReusingPreviousFeedIfConfigChanged),
             ("testNotReusingPreviousFeedIfItemWasAdded", testNotReusingPreviousFeedIfItemWasAdded)
@@ -156,12 +197,13 @@ private extension PodcastFeedGenerationTests {
         )
     }
 
-    func makeStubbedAudioMetadata() -> String {
+    func makeStubbedAudioMetadata(including additionalString: String = "") -> String {
         """
         ---
         audio.url: https://audio.mp3
         audio.duration: 05:02
         audio.size: 12345
+        \(additionalString)
         ---
         """
     }
@@ -169,6 +211,7 @@ private extension PodcastFeedGenerationTests {
     func generateFeed(
         in folder: Folder,
         config: Configuration? = nil,
+        itemPredicate: Predicate<Item<Site>>? = nil,
         generationSteps: [PublishingStep<Site>] = [
             .addMarkdownFiles()
         ],
@@ -179,6 +222,7 @@ private extension PodcastFeedGenerationTests {
             .group(generationSteps),
             .generatePodcastFeed(
                 for: .one,
+                itemPredicate: itemPredicate,
                 config: config ?? makeConfigStub(),
                 date: date
             )
